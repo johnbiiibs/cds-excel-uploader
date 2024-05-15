@@ -7,7 +7,7 @@ function defaultTask(cb) {
     const js = gulp
         .src('srv/utils/*.js')
         .pipe(JavaScriptObfuscator())
-        .pipe(gulp.dest('dist/lib'));
+        .pipe(gulp.dest('dist/srv/utils'));
 
     const cds = gulp.src('srv/*.cds')
         .pipe(gulp.dest('dist/srv'))
