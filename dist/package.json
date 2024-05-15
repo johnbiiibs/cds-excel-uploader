@@ -1,10 +1,10 @@
 {
   "name": "@johnbiiibs/cds-excel-uploader",
-  "version": "1.0.1",
-  "description": "A simple CAP project.",
+  "version": "1.0.3",
+  "description": "A CAP Plugin for Excel Uploads",
   "main": "index.js",
   "repository": "<Add your repository here>",
-  "license": "UNLICENSED",
+  "license": "MIT",
   "dependencies": {
     "@sap/cds": "^7",
     "express": "^4",
