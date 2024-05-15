@@ -18,12 +18,20 @@ const ExpressMiddleware = {
             const sheets = workbook.Sheets;
             const sheetNames = workbook.SheetNames;
 
+            const xlsxOpts = {
+                cellText: true,
+                cellDates: true,
+                dateNF: 'dd"."mm"."yyyy',
+                rawNumbers: false,
+                defval: ""
+            };
+
             const sheetData = sheetNames.map((name) => {
                 const sheet = sheets[name];
                 const response = {};
                 const data = []
 
-                const jsonSheet = xlsx.utils.sheet_to_json(sheet);
+                const jsonSheet = xlsx.utils.sheet_to_json(sheet, xlsxOpts);
                 jsonSheet.forEach((res) => {
                     data.push(JSON.parse(JSON.stringify(res)))
                 });
