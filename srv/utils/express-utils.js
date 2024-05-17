@@ -1,49 +1,63 @@
 const xlsx = require('xlsx');
 
 const ExpressMiddleware = {
+
     /**
-     * Uploads imported data template to Table in the HANA Database.
-     *
-     * @param {express.Request} req - The request object where file is stored
-     * @param {express.Response} res - The response object where we pass the resulting status
+     * Parses the contents of the req.query object.
+     * It also accepts an (optional) object based on the XLSX.utils.sheet_to_json options argument.
+     * 
+     * More details here: https://docs.sheetjs.com/docs/api/utilities/array#array-output
+     * 
+     * @param {object} options - XLSX.utils.sheet_to_json options argument (optional)
+     * @returns {Function} An Express.js middleware function
      */
-    parseExcel: async (req, res, next) => {
-        const { files } = req;
+    parseExcel: (options = null) => {
 
-        try {
-            // Current limitation, get first file only
-            const data = files[Object.keys(files)[0]].data;
-            const workbook = xlsx.read(data);
+        /**
+         * Uploads imported data template to Table in the HANA Database.
+         *
+         * @param {express.Request} req - The request object where file is stored
+         * @param {express.Response} res - The response object where we pass the resulting status
+         * @param {express.Next} next - The express.js next() callback
+         */
+        return async (req, res, next) => {
+            const { files } = req;
 
-            const sheets = workbook.Sheets;
-            const sheetNames = workbook.SheetNames;
+            try {
+                // Current limitation, get first file only
+                const data = files[Object.keys(files)[0]].data;
+                const workbook = xlsx.read(data);
 
-            const xlsxOpts = {
-                cellText: true,
-                cellDates: true,
-                dateNF: 'dd"."mm"."yyyy',
-                rawNumbers: false,
-                defval: ""
-            };
+                const sheets = workbook.Sheets;
+                const sheetNames = workbook.SheetNames;
 
-            const sheetData = sheetNames.map((name) => {
-                const sheet = sheets[name];
-                const response = {};
-                const data = []
+                const xlsxOpts = options || {
+                    cellText: true,
+                    cellDates: true,
+                    dateNF: 'dd"."mm"."yyyy',
+                    rawNumbers: false,
+                    defval: ""
+                };
 
-                const jsonSheet = xlsx.utils.sheet_to_json(sheet, xlsxOpts);
-                jsonSheet.forEach((res) => {
-                    data.push(JSON.parse(JSON.stringify(res)))
+                const sheetData = sheetNames.map((name) => {
+                    const sheet = sheets[name];
+                    const response = {};
+                    const data = []
+
+                    const jsonSheet = xlsx.utils.sheet_to_json(sheet, xlsxOpts);
+                    jsonSheet.forEach((res) => {
+                        data.push(JSON.parse(JSON.stringify(res)))
+                    });
+
+                    response[name] = data;
+                    return response;
                 });
 
-                response[name] = data;
-                return response;
-            });
-
-            req.fileData = sheetData;
-            next();
-        } catch (error) {
-            next(error);
+                req.fileData = sheetData;
+                next();
+            } catch (error) {
+                next(error);
+            }
         }
     }
 };
