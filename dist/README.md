@@ -36,7 +36,7 @@ module.exports = async srv => {
     const { ExcelUpload } = srv.entities;
 
     // handler for the excel file
-    srv.on("PUT", ExcelUpload, parseExcel);
+    srv.on("PUT", ExcelUpload, parseExcel());
 
     // handler for the parsed excel data
     srv.on("PUT", ExcelUpload, async (req, next) => {
@@ -73,7 +73,7 @@ const { express: middleware } = require("@johnbiiibs/cds-excel-uploader");
 const { parseExcel } = middleware;
 
 cds.on("bootstrap", (app) => {
-    app.post("/upload", fileUpload(), parseExcel, (req, res, next) => {
+    app.post("/upload", fileUpload(), parseExcel(), (req, res, next) => {
         // 'req.fileData' contains the excel data
         res.json(req.fileData);
     });
